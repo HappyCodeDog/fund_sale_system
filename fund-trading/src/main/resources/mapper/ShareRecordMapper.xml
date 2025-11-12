@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bank.fund.trading.infrastructure.persistence.ShareRecordMapper">
+    
+    <resultMap id="ShareRecordResultMap" 
+               type="com.bank.fund.trading.infrastructure.persistence.po.ShareRecordPO">
+        <id property="id" column="ID"/>
+        <result property="customerId" column="CUSTOMER_ID"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="shareAmount" column="SHARE_AMOUNT"/>
+        <result property="availableAmount" column="AVAILABLE_AMOUNT"/>
+        <result property="frozenAmount" column="FROZEN_AMOUNT"/>
+        <result property="status" column="STATUS"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+    
+    <select id="findByCustomerAndProduct" resultMap="ShareRecordResultMap">
+        SELECT 
+            ID,
+            CUSTOMER_ID,
+            PRODUCT_CODE,
+            SHARE_AMOUNT,
+            AVAILABLE_AMOUNT,
+            FROZEN_AMOUNT,
+            STATUS,
+            CREATED_AT,
+            UPDATED_AT
+        FROM SHARE_RECORD
+        WHERE CUSTOMER_ID = #{customerId}
+          AND PRODUCT_CODE = #{productCode}
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO SHARE_RECORD (
+            ID,
+            CUSTOMER_ID,
+            PRODUCT_CODE,
+            SHARE_AMOUNT,
+            AVAILABLE_AMOUNT,
+            FROZEN_AMOUNT,
+            STATUS,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+            #{id},
+            #{customerId},
+            #{productCode},
+            #{shareAmount},
+            #{availableAmount},
+            #{frozenAmount},
+            #{status},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE SHARE_RECORD
+        SET SHARE_AMOUNT = #{shareAmount},
+            AVAILABLE_AMOUNT = #{availableAmount},
+            FROZEN_AMOUNT = #{frozenAmount},
+            STATUS = #{status},
+            UPDATED_AT = #{updatedAt}
+        WHERE ID = #{id}
+    </update>
+    
+</mapper>
+

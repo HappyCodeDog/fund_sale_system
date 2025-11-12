@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bank.fund.marketing.infrastructure.persistence.CouponUsageMapper">
+    
+    <resultMap id="CouponUsageRecordResultMap" type="com.bank.fund.marketing.infrastructure.persistence.po.CouponUsageRecordPO">
+        <id property="id" column="ID"/>
+        <result property="transactionSerialNumber" column="TRANSACTION_SERIAL_NUMBER"/>
+        <result property="customerId" column="CUSTOMER_ID"/>
+        <result property="couponId" column="COUPON_ID"/>
+        <result property="originalFee" column="ORIGINAL_FEE"/>
+        <result property="discountAmount" column="DISCOUNT_AMOUNT"/>
+        <result property="finalFee" column="FINAL_FEE"/>
+        <result property="status" column="STATUS"/>
+        <result property="usedAt" column="USED_AT"/>
+        <result property="returnedAt" column="RETURNED_AT"/>
+        <result property="createdAt" column="CREATED_AT"/>
+    </resultMap>
+    
+    <select id="findById" resultMap="CouponUsageRecordResultMap">
+        SELECT 
+            ID,
+            TRANSACTION_SERIAL_NUMBER,
+            CUSTOMER_ID,
+            COUPON_ID,
+            ORIGINAL_FEE,
+            DISCOUNT_AMOUNT,
+            FINAL_FEE,
+            STATUS,
+            USED_AT,
+            RETURNED_AT,
+            CREATED_AT
+        FROM COUPON_USAGE_RECORD
+        WHERE ID = #{id}
+    </select>
+    
+    <select id="findByTransactionSerialNumber" resultMap="CouponUsageRecordResultMap">
+        SELECT 
+            ID,
+            TRANSACTION_SERIAL_NUMBER,
+            CUSTOMER_ID,
+            COUPON_ID,
+            ORIGINAL_FEE,
+            DISCOUNT_AMOUNT,
+            FINAL_FEE,
+            STATUS,
+            USED_AT,
+            RETURNED_AT,
+            CREATED_AT
+        FROM COUPON_USAGE_RECORD
+        WHERE TRANSACTION_SERIAL_NUMBER = #{transactionSerialNumber}
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO COUPON_USAGE_RECORD (
+            ID,
+            TRANSACTION_SERIAL_NUMBER,
+            CUSTOMER_ID,
+            COUPON_ID,
+            ORIGINAL_FEE,
+            DISCOUNT_AMOUNT,
+            FINAL_FEE,
+            STATUS,
+            USED_AT,
+            RETURNED_AT,
+            CREATED_AT
+        ) VALUES (
+            #{id},
+            #{transactionSerialNumber},
+            #{customerId},
+            #{couponId},
+            #{originalFee},
+            #{discountAmount},
+            #{finalFee},
+            #{status},
+            #{usedAt},
+            #{returnedAt},
+            #{createdAt}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE COUPON_USAGE_RECORD
+        SET STATUS = #{status},
+            RETURNED_AT = #{returnedAt}
+        WHERE ID = #{id}
+    </update>
+    
+</mapper>
+

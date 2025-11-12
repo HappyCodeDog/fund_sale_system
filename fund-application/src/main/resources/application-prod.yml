@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@prod-oracle-host:1521:PRODDB
+    username: fund_user_prod
+    password: ${FUND_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+
+logging:
+  level:
+    root: WARN
+    com.bank.fund: INFO
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      coreBank:
+        wait-duration-in-open-state: 30000
+      marketing:
+        wait-duration-in-open-state: 15000
+

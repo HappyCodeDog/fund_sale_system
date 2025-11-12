@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@dev-oracle-host:1521:DEVDB
+    username: fund_user_dev
+    password: fund_password_dev
+
+logging:
+  level:
+    com.bank.fund: DEBUG
+    org.springframework: DEBUG
+

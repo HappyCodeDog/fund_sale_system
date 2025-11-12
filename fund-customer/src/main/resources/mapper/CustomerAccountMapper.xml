@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bank.fund.customer.infrastructure.persistence.CustomerAccountMapper">
+    
+    <resultMap id="CustomerAccountResultMap" type="com.bank.fund.customer.infrastructure.persistence.po.CustomerAccountPO">
+        <id property="customerId" column="CUSTOMER_ID"/>
+        <result property="customerName" column="CUSTOMER_NAME"/>
+        <result property="customerType" column="CUSTOMER_TYPE"/>
+        <result property="accountNumber" column="ACCOUNT_NUMBER"/>
+        <result property="accountStatus" column="ACCOUNT_STATUS"/>
+        <result property="riskTolerance" column="RISK_TOLERANCE"/>
+        <result property="suitabilityAssessmentDate" column="SUITABILITY_ASSESSMENT_DATE"/>
+        <result property="suitabilityExpired" column="SUITABILITY_EXPIRED"/>
+        <result property="idType" column="ID_TYPE"/>
+        <result property="idNumber" column="ID_NUMBER"/>
+        <result property="phoneNumber" column="PHONE_NUMBER"/>
+        <result property="email" column="EMAIL"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+    
+    <select id="findByCustomerId" resultMap="CustomerAccountResultMap">
+        SELECT 
+            CUSTOMER_ID,
+            CUSTOMER_NAME,
+            CUSTOMER_TYPE,
+            ACCOUNT_NUMBER,
+            ACCOUNT_STATUS,
+            RISK_TOLERANCE,
+            SUITABILITY_ASSESSMENT_DATE,
+            SUITABILITY_EXPIRED,
+            ID_TYPE,
+            ID_NUMBER,
+            PHONE_NUMBER,
+            EMAIL,
+            CREATED_AT,
+            UPDATED_AT
+        FROM CUSTOMER_ACCOUNT
+        WHERE CUSTOMER_ID = #{customerId}
+    </select>
+    
+    <select id="findByAccountNumber" resultMap="CustomerAccountResultMap">
+        SELECT 
+            CUSTOMER_ID,
+            CUSTOMER_NAME,
+            CUSTOMER_TYPE,
+            ACCOUNT_NUMBER,
+            ACCOUNT_STATUS,
+            RISK_TOLERANCE,
+            SUITABILITY_ASSESSMENT_DATE,
+            SUITABILITY_EXPIRED,
+            ID_TYPE,
+            ID_NUMBER,
+            PHONE_NUMBER,
+            EMAIL,
+            CREATED_AT,
+            UPDATED_AT
+        FROM CUSTOMER_ACCOUNT
+        WHERE ACCOUNT_NUMBER = #{accountNumber}
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO CUSTOMER_ACCOUNT (
+            CUSTOMER_ID,
+            CUSTOMER_NAME,
+            CUSTOMER_TYPE,
+            ACCOUNT_NUMBER,
+            ACCOUNT_STATUS,
+            RISK_TOLERANCE,
+            SUITABILITY_ASSESSMENT_DATE,
+            SUITABILITY_EXPIRED,
+            ID_TYPE,
+            ID_NUMBER,
+            PHONE_NUMBER,
+            EMAIL,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+            #{customerId},
+            #{customerName},
+            #{customerType},
+            #{accountNumber},
+            #{accountStatus},
+            #{riskTolerance},
+            #{suitabilityAssessmentDate},
+            #{suitabilityExpired},
+            #{idType},
+            #{idNumber},
+            #{phoneNumber},
+            #{email},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE CUSTOMER_ACCOUNT
+        SET CUSTOMER_NAME = #{customerName},
+            CUSTOMER_TYPE = #{customerType},
+            ACCOUNT_NUMBER = #{accountNumber},
+            ACCOUNT_STATUS = #{accountStatus},
+            RISK_TOLERANCE = #{riskTolerance},
+            SUITABILITY_ASSESSMENT_DATE = #{suitabilityAssessmentDate},
+            SUITABILITY_EXPIRED = #{suitabilityExpired},
+            ID_TYPE = #{idType},
+            ID_NUMBER = #{idNumber},
+            PHONE_NUMBER = #{phoneNumber},
+            EMAIL = #{email},
+            UPDATED_AT = #{updatedAt}
+        WHERE CUSTOMER_ID = #{customerId}
+    </update>
+    
+</mapper>
+

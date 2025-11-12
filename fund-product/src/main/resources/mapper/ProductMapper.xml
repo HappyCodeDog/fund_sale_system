@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bank.fund.product.infrastructure.persistence.ProductMapper">
+    
+    <resultMap id="FundProductResultMap" type="com.bank.fund.product.infrastructure.persistence.po.FundProductPO">
+        <id property="productCode" column="PRODUCT_CODE"/>
+        <result property="productName" column="PRODUCT_NAME"/>
+        <result property="productStatus" column="PRODUCT_STATUS"/>
+        <result property="transactionStatus" column="TRANSACTION_STATUS"/>
+        <result property="riskLevel" column="RISK_LEVEL"/>
+        <result property="minInitialAmount" column="MIN_INITIAL_AMOUNT"/>
+        <result property="minAdditionalAmount" column="MIN_ADDITIONAL_AMOUNT"/>
+        <result property="maxSubscriptionAmount" column="MAX_SUBSCRIPTION_AMOUNT"/>
+        <result property="amountUnit" column="AMOUNT_UNIT"/>
+        <result property="dailyTaQuota" column="DAILY_TA_QUOTA"/>
+        <result property="allowedChannels" column="ALLOWED_CHANNELS"/>
+        <result property="currencyCode" column="CURRENCY_CODE"/>
+        <result property="subscriptionFeeRate" column="SUBSCRIPTION_FEE_RATE"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+    
+    <select id="findByProductCode" resultMap="FundProductResultMap">
+        SELECT 
+            PRODUCT_CODE,
+            PRODUCT_NAME,
+            PRODUCT_STATUS,
+            TRANSACTION_STATUS,
+            RISK_LEVEL,
+            MIN_INITIAL_AMOUNT,
+            MIN_ADDITIONAL_AMOUNT,
+            MAX_SUBSCRIPTION_AMOUNT,
+            AMOUNT_UNIT,
+            DAILY_TA_QUOTA,
+            ALLOWED_CHANNELS,
+            CURRENCY_CODE,
+            SUBSCRIPTION_FEE_RATE,
+            CREATED_AT,
+            UPDATED_AT
+        FROM FUND_PRODUCT
+        WHERE PRODUCT_CODE = #{productCode}
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO FUND_PRODUCT (
+            PRODUCT_CODE,
+            PRODUCT_NAME,
+            PRODUCT_STATUS,
+            TRANSACTION_STATUS,
+            RISK_LEVEL,
+            MIN_INITIAL_AMOUNT,
+            MIN_ADDITIONAL_AMOUNT,
+            MAX_SUBSCRIPTION_AMOUNT,
+            AMOUNT_UNIT,
+            DAILY_TA_QUOTA,
+            ALLOWED_CHANNELS,
+            CURRENCY_CODE,
+            SUBSCRIPTION_FEE_RATE,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+            #{productCode},
+            #{productName},
+            #{productStatus},
+            #{transactionStatus},
+            #{riskLevel},
+            #{minInitialAmount},
+            #{minAdditionalAmount},
+            #{maxSubscriptionAmount},
+            #{amountUnit},
+            #{dailyTaQuota},
+            #{allowedChannels},
+            #{currencyCode},
+            #{subscriptionFeeRate},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE FUND_PRODUCT
+        SET PRODUCT_NAME = #{productName},
+            PRODUCT_STATUS = #{productStatus},
+            TRANSACTION_STATUS = #{transactionStatus},
+            RISK_LEVEL = #{riskLevel},
+            MIN_INITIAL_AMOUNT = #{minInitialAmount},
+            MIN_ADDITIONAL_AMOUNT = #{minAdditionalAmount},
+            MAX_SUBSCRIPTION_AMOUNT = #{maxSubscriptionAmount},
+            AMOUNT_UNIT = #{amountUnit},
+            DAILY_TA_QUOTA = #{dailyTaQuota},
+            ALLOWED_CHANNELS = #{allowedChannels},
+            CURRENCY_CODE = #{currencyCode},
+            SUBSCRIPTION_FEE_RATE = #{subscriptionFeeRate},
+            UPDATED_AT = #{updatedAt}
+        WHERE PRODUCT_CODE = #{productCode}
+    </update>
+    
+</mapper>
+

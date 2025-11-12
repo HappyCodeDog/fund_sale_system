@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bank.fund.trading.infrastructure.persistence.SubscriptionTransactionMapper">
+    
+    <resultMap id="SubscriptionTransactionResultMap" 
+               type="com.bank.fund.trading.infrastructure.persistence.po.SubscriptionTransactionPO">
+        <id property="serialNumber" column="SERIAL_NUMBER"/>
+        <result property="customerId" column="CUSTOMER_ID"/>
+        <result property="accountNumber" column="ACCOUNT_NUMBER"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="subscriptionAmount" column="SUBSCRIPTION_AMOUNT"/>
+        <result property="currencyCode" column="CURRENCY_CODE"/>
+        <result property="feeRate" column="FEE_RATE"/>
+        <result property="originalFee" column="ORIGINAL_FEE"/>
+        <result property="discountAmount" column="DISCOUNT_AMOUNT"/>
+        <result property="finalFee" column="FINAL_FEE"/>
+        <result property="couponId" column="COUPON_ID"/>
+        <result property="marketingUsageId" column="MARKETING_USAGE_ID"/>
+        <result property="channel" column="CHANNEL"/>
+        <result property="status" column="STATUS"/>
+        <result property="coreBankingTxnId" column="CORE_BANKING_TXN_ID"/>
+        <result property="freezeId" column="FREEZE_ID"/>
+        <result property="sagaState" column="SAGA_STATE"/>
+        <result property="errorCode" column="ERROR_CODE"/>
+        <result property="errorMessage" column="ERROR_MESSAGE"/>
+        <result property="firstTimeSubscription" column="FIRST_TIME_SUBSCRIPTION"/>
+        <result property="requestTime" column="REQUEST_TIME"/>
+        <result property="completionTime" column="COMPLETION_TIME"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+    
+    <select id="findBySerialNumber" resultMap="SubscriptionTransactionResultMap">
+        SELECT 
+            SERIAL_NUMBER,
+            CUSTOMER_ID,
+            ACCOUNT_NUMBER,
+            PRODUCT_CODE,
+            SUBSCRIPTION_AMOUNT,
+            CURRENCY_CODE,
+            FEE_RATE,
+            ORIGINAL_FEE,
+            DISCOUNT_AMOUNT,
+            FINAL_FEE,
+            COUPON_ID,
+            MARKETING_USAGE_ID,
+            CHANNEL,
+            STATUS,
+            CORE_BANKING_TXN_ID,
+            FREEZE_ID,
+            SAGA_STATE,
+            ERROR_CODE,
+            ERROR_MESSAGE,
+            FIRST_TIME_SUBSCRIPTION,
+            REQUEST_TIME,
+            COMPLETION_TIME,
+            CREATED_AT,
+            UPDATED_AT
+        FROM SUBSCRIPTION_TRANSACTION
+        WHERE SERIAL_NUMBER = #{serialNumber}
+    </select>
+    
+    <select id="countByCustomerAndProduct" resultType="int">
+        SELECT COUNT(*)
+        FROM SUBSCRIPTION_TRANSACTION
+        WHERE CUSTOMER_ID = #{customerId}
+          AND PRODUCT_CODE = #{productCode}
+          AND STATUS IN ('SUCCESS', 'ACCOUNTING_SUCCESS', 'FREEZE_SUCCESS')
+    </select>
+    
+    <insert id="insert">
+        INSERT INTO SUBSCRIPTION_TRANSACTION (
+            SERIAL_NUMBER,
+            CUSTOMER_ID,
+            ACCOUNT_NUMBER,
+            PRODUCT_CODE,
+            SUBSCRIPTION_AMOUNT,
+            CURRENCY_CODE,
+            FEE_RATE,
+            ORIGINAL_FEE,
+            DISCOUNT_AMOUNT,
+            FINAL_FEE,
+            COUPON_ID,
+            MARKETING_USAGE_ID,
+            CHANNEL,
+            STATUS,
+            CORE_BANKING_TXN_ID,
+            FREEZE_ID,
+            SAGA_STATE,
+            ERROR_CODE,
+            ERROR_MESSAGE,
+            FIRST_TIME_SUBSCRIPTION,
+            REQUEST_TIME,
+            COMPLETION_TIME,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+            #{serialNumber},
+            #{customerId},
+            #{accountNumber},
+            #{productCode},
+            #{subscriptionAmount},
+            #{currencyCode},
+            #{feeRate},
+            #{originalFee},
+            #{discountAmount},
+            #{finalFee},
+            #{couponId},
+            #{marketingUsageId},
+            #{channel},
+            #{status},
+            #{coreBankingTxnId},
+            #{freezeId},
+            #{sagaState},
+            #{errorCode},
+            #{errorMessage},
+            #{firstTimeSubscription},
+            #{requestTime},
+            #{completionTime},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <update id="update">
+        UPDATE SUBSCRIPTION_TRANSACTION
+        SET CUSTOMER_ID = #{customerId},
+            ACCOUNT_NUMBER = #{accountNumber},
+            PRODUCT_CODE = #{productCode},
+            SUBSCRIPTION_AMOUNT = #{subscriptionAmount},
+            CURRENCY_CODE = #{currencyCode},
+            FEE_RATE = #{feeRate},
+            ORIGINAL_FEE = #{originalFee},
+            DISCOUNT_AMOUNT = #{discountAmount},
+            FINAL_FEE = #{finalFee},
+            COUPON_ID = #{couponId},
+            MARKETING_USAGE_ID = #{marketingUsageId},
+            CHANNEL = #{channel},
+            STATUS = #{status},
+            CORE_BANKING_TXN_ID = #{coreBankingTxnId},
+            FREEZE_ID = #{freezeId},
+            SAGA_STATE = #{sagaState},
+            ERROR_CODE = #{errorCode},
+            ERROR_MESSAGE = #{errorMessage},
+            FIRST_TIME_SUBSCRIPTION = #{firstTimeSubscription},
+            REQUEST_TIME = #{requestTime},
+            COMPLETION_TIME = #{completionTime},
+            UPDATED_AT = #{updatedAt}
+        WHERE SERIAL_NUMBER = #{serialNumber}
+    </update>
+    
+</mapper>
+
