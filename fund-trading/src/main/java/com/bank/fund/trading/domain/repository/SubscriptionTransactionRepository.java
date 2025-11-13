@@ -2,6 +2,7 @@ package com.bank.fund.trading.domain.repository;
 
 import com.bank.fund.trading.domain.model.SubscriptionTransaction;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -28,5 +29,11 @@ public interface SubscriptionTransactionRepository {
      * Check if customer has existing subscription for product
      */
     boolean hasExistingSubscription(String customerId, String productCode);
+    
+    /**
+     * Find failed transactions that need compensation
+     * Returns transactions with status FAILED and saga state indicating compensation needed
+     */
+    List<SubscriptionTransaction> findFailedTransactionsNeedingCompensation();
 }
 

@@ -4,6 +4,8 @@ import com.bank.fund.trading.infrastructure.persistence.po.SubscriptionTransacti
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * MyBatis mapper for subscription transaction
  */
@@ -30,5 +32,11 @@ public interface SubscriptionTransactionMapper {
      * Update transaction
      */
     int update(SubscriptionTransactionPO transaction);
+    
+    /**
+     * Find failed transactions that need compensation
+     * Returns transactions with status FAILED and saga state indicating compensation needed
+     */
+    List<SubscriptionTransactionPO> findFailedTransactionsNeedingCompensation();
 }
 

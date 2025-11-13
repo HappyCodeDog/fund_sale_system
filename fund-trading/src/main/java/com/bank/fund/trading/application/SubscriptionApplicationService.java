@@ -61,6 +61,7 @@ public class SubscriptionApplicationService {
                  correlationId, request.getCustomerId(), request.getProductCode(), request.getAmount());
         
         long startTime = System.currentTimeMillis();
+        SubscriptionTransaction transaction = null;
         
         try {
             // 1. Generate unique transaction serial number
@@ -103,7 +104,7 @@ public class SubscriptionApplicationService {
                      feeCalculation.getDiscountAmount(), feeCalculation.getFinalFee());
             
             // 5. Create transaction aggregate
-            SubscriptionTransaction transaction = createTransaction(
+            transaction = createTransaction(
                 serialNumber, request, subscriptionAmount, feeCalculation, 
                 validationResult.isFirstTimeSubscription()
             );
@@ -177,16 +178,37 @@ public class SubscriptionApplicationService {
         } catch (Exception e) {
             log.error("[{}] Subscription process failed", correlationId, e);
             
-            // Handle compensation if transaction was created
-            handleFailure(correlationId, e);
+            // Save transaction failure state if transaction was created
+            String errorCode = e instanceof BusinessException ? 
+                ((BusinessException) e).getErrorCode() : ErrorCode.SYSTEM_ERROR;
+            String errorMessage = e.getMessage();
+            
+            if (transaction != null) {
+                try {
+                    // Mark transaction as failed and save
+                    transaction.markFailed(errorCode, errorMessage);
+                    transaction.setUpdatedAt(LocalDateTime.now());
+                    transactionRepository.update(transaction);
+                    log.info("[{}] Transaction failure state saved, sagaState: {}", 
+                             correlationId, transaction.getSagaState());
+                    
+                    // Trigger compensation if needed
+                    handleFailure(transaction, correlationId);
+                } catch (Exception saveException) {
+                    log.error("[{}] Failed to save transaction failure state", correlationId, saveException);
+                    // Still try to trigger compensation even if save failed
+                    handleFailure(transaction, correlationId);
+                }
+            } else {
+                log.warn("[{}] Transaction was not created, no compensation needed", correlationId);
+            }
             
             recordMetrics("failed", System.currentTimeMillis() - startTime);
             
             return SubscriptionResponse.builder()
                 .success(false)
-                .errorCode(e instanceof BusinessException ? 
-                    ((BusinessException) e).getErrorCode() : ErrorCode.SYSTEM_ERROR)
-                .errorMessage(e.getMessage())
+                .errorCode(errorCode)
+                .errorMessage(errorMessage)
                 .build();
         }
     }
@@ -310,10 +332,47 @@ public class SubscriptionApplicationService {
     /**
      * Handle failure and trigger compensation
      */
-    private void handleFailure(String correlationId, Exception e) {
-        log.error("[{}] Handling failure, triggering compensation if needed", correlationId);
-        // In a real implementation, we would retrieve the partially completed transaction
-        // and trigger async compensation. For now, we just log.
+    private void handleFailure(SubscriptionTransaction transaction, String correlationId) {
+        if (transaction == null) {
+            log.warn("[{}] Transaction is null, cannot trigger compensation", correlationId);
+            return;
+        }
+        
+        // Check if compensation is needed based on saga state
+        boolean needsCompensation = transaction.needCouponCompensation() || 
+                                   transaction.needAccountingCompensation() || 
+                                   transaction.needFreezeCompensation();
+        
+        if (!needsCompensation) {
+            log.info("[{}] Transaction does not need compensation, sagaState: {}", 
+                     correlationId, transaction.getSagaState());
+            return;
+        }
+        
+        log.info("[{}] Triggering compensation for transaction: {}, sagaState: {}", 
+                 correlationId, transaction.getId(), transaction.getSagaState());
+        
+        try {
+            // Trigger async compensation
+            rollbackService.compensate(transaction)
+                .thenAccept(result -> {
+                    if (result.isSuccess()) {
+                        log.info("[{}] Compensation completed successfully for transaction: {}", 
+                                correlationId, transaction.getId());
+                    } else {
+                        log.error("[{}] Compensation failed for transaction: {}, error: {}", 
+                                 correlationId, transaction.getId(), result.getErrorMessage());
+                    }
+                })
+                .exceptionally(ex -> {
+                    log.error("[{}] Exception during compensation for transaction: {}", 
+                             correlationId, transaction.getId(), ex);
+                    return null;
+                });
+        } catch (Exception e) {
+            log.error("[{}] Failed to trigger compensation for transaction: {}", 
+                     correlationId, transaction.getId(), e);
+        }
     }
     
     /**

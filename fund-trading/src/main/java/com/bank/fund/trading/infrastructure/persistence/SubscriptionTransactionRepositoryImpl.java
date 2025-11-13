@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Currency;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of SubscriptionTransactionRepository using MyBatis
@@ -43,6 +45,14 @@ public class SubscriptionTransactionRepositoryImpl implements SubscriptionTransa
     public boolean hasExistingSubscription(String customerId, String productCode) {
         int count = subscriptionTransactionMapper.countByCustomerAndProduct(customerId, productCode);
         return count > 0;
+    }
+    
+    @Override
+    public List<SubscriptionTransaction> findFailedTransactionsNeedingCompensation() {
+        List<SubscriptionTransactionPO> pos = subscriptionTransactionMapper.findFailedTransactionsNeedingCompensation();
+        return pos.stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
     }
     
     private SubscriptionTransaction toDomain(SubscriptionTransactionPO po) {
