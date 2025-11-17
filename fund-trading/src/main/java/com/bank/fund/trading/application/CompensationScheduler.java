@@ -34,6 +34,13 @@ public class CompensationScheduler {
         log.info("Starting scheduled compensation scan for failed transactions");
         
         try {
+            // First, check for stuck transactions that may need recovery
+            checkStuckTransactions();
+        } catch (Exception e) {
+            log.error("Error during stuck transaction check", e);
+        }
+        
+        try {
             List<SubscriptionTransaction> failedTransactions = 
                 transactionRepository.findFailedTransactionsNeedingCompensation();
             
@@ -100,6 +107,47 @@ public class CompensationScheduler {
             
         } catch (Exception e) {
             log.error("Error during scheduled compensation scan", e);
+        }
+    }
+    
+    /**
+     * Check for stuck transactions that may have been interrupted during processing
+     * These could be transactions where accounting succeeded but process crashed before update
+     */
+    private void checkStuckTransactions() {
+        log.debug("Checking for stuck transactions");
+        
+        // Find transactions stuck for more than 10 minutes
+        List<SubscriptionTransaction> stuckTransactions = 
+            transactionRepository.findStuckTransactionsForRecovery(10);
+        
+        if (stuckTransactions.isEmpty()) {
+            log.debug("No stuck transactions found");
+            return;
+        }
+        
+        log.warn("Found {} stuck transactions that may need manual review or recovery", 
+                 stuckTransactions.size());
+        
+        for (SubscriptionTransaction transaction : stuckTransactions) {
+            log.warn("Stuck transaction detected - ID: {}, Status: {}, SagaState: {}, " +
+                     "CoreBankingTxnId: {}, FreezeId: {}, UpdatedAt: {}. " +
+                     "This may indicate a process crash after accounting. Manual review recommended.", 
+                     transaction.getId(), transaction.getStatus(), transaction.getSagaState(),
+                     transaction.getCoreBankingTxnId(), transaction.getFreezeId(), 
+                     transaction.getUpdatedAt());
+            
+            // Mark as failed to trigger compensation on next scan
+            // This handles the case where accounting may have succeeded but wasn't recorded
+            try {
+                transaction.markFailed("STUCK_TRANSACTION", 
+                    "Transaction stuck in non-final state, marked for compensation");
+                transaction.setUpdatedAt(LocalDateTime.now());
+                transactionRepository.update(transaction);
+                log.info("Marked stuck transaction {} as FAILED for compensation", transaction.getId());
+            } catch (Exception e) {
+                log.error("Failed to mark stuck transaction {} as failed", transaction.getId(), e);
+            }
         }
     }
 }

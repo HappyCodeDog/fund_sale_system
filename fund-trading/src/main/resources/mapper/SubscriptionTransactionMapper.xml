@@ -183,5 +183,38 @@
         ORDER BY CREATED_AT ASC
     </select>
     
+    <select id="findStuckTransactionsForRecovery" resultMap="SubscriptionTransactionResultMap">
+        SELECT 
+            SERIAL_NUMBER,
+            CUSTOMER_ID,
+            ACCOUNT_NUMBER,
+            PRODUCT_CODE,
+            SUBSCRIPTION_AMOUNT,
+            CURRENCY_CODE,
+            FEE_RATE,
+            ORIGINAL_FEE,
+            DISCOUNT_AMOUNT,
+            FINAL_FEE,
+            COUPON_ID,
+            MARKETING_USAGE_ID,
+            CHANNEL,
+            STATUS,
+            CORE_BANKING_TXN_ID,
+            FREEZE_ID,
+            SAGA_STATE,
+            ERROR_CODE,
+            ERROR_MESSAGE,
+            FIRST_TIME_SUBSCRIPTION,
+            REQUEST_TIME,
+            COMPLETION_TIME,
+            CREATED_AT,
+            UPDATED_AT
+        FROM SUBSCRIPTION_TRANSACTION
+        WHERE STATUS NOT IN ('SUCCESS', 'FAILED', 'COMPENSATING')
+          AND SAGA_STATE NOT IN ('COMPLETED', 'COMPENSATING', 'COMPENSATION_COMPLETED')
+          AND UPDATED_AT &lt; SYSDATE - (#{minutesThreshold} / 1440)
+        ORDER BY UPDATED_AT ASC
+    </select>
+    
 </mapper>
 

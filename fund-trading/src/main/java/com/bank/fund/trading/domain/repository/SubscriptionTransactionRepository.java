@@ -35,5 +35,12 @@ public interface SubscriptionTransactionRepository {
      * Returns transactions with status FAILED and saga state indicating compensation needed
      */
     List<SubscriptionTransaction> findFailedTransactionsNeedingCompensation();
+    
+    /**
+     * Find stuck transactions that may have accounting/freeze completed but not updated
+     * These are transactions in non-final state but older than threshold
+     * Used to detect process crashes during accounting update
+     */
+    List<SubscriptionTransaction> findStuckTransactionsForRecovery(int minutesThreshold);
 }
 

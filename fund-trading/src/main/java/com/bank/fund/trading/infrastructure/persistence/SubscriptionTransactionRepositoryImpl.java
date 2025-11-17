@@ -55,6 +55,14 @@ public class SubscriptionTransactionRepositoryImpl implements SubscriptionTransa
                 .collect(Collectors.toList());
     }
     
+    @Override
+    public List<SubscriptionTransaction> findStuckTransactionsForRecovery(int minutesThreshold) {
+        List<SubscriptionTransactionPO> pos = subscriptionTransactionMapper.findStuckTransactionsForRecovery(minutesThreshold);
+        return pos.stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+    
     private SubscriptionTransaction toDomain(SubscriptionTransactionPO po) {
         Currency currency = Currency.getInstance(po.getCurrencyCode());
         

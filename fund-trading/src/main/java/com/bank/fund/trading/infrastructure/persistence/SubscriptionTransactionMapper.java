@@ -38,5 +38,11 @@ public interface SubscriptionTransactionMapper {
      * Returns transactions with status FAILED and saga state indicating compensation needed
      */
     List<SubscriptionTransactionPO> findFailedTransactionsNeedingCompensation();
+    
+    /**
+     * Find stuck transactions that may have been interrupted during processing
+     * Returns transactions in non-final state older than threshold minutes
+     */
+    List<SubscriptionTransactionPO> findStuckTransactionsForRecovery(@Param("minutesThreshold") int minutesThreshold);
 }
 

@@ -137,6 +137,9 @@ public class SubscriptionApplicationService {
             }
             
             // 9. Execute accounting operation (Saga Step 2)
+            // CRITICAL: Must handle accounting result atomically to prevent data inconsistency
+            // If process crashes after accounting succeeds but before state is persisted,
+            // we need a way to detect and compensate
             AccountingService.AccountingResult accountingResult = accountingService.executeAccounting(
                 transaction,
                 validationResult.getProduct().getCurrencyCode(),
@@ -144,13 +147,17 @@ public class SubscriptionApplicationService {
             );
             
             if (accountingResult.isSuccess()) {
+                // Update state in memory AND persist immediately in same operation
                 if (accountingResult.getCoreBankingTxnId() != null) {
                     transaction.markAccountingCompleted(accountingResult.getCoreBankingTxnId());
                 } else if (accountingResult.getFreezeId() != null) {
                     transaction.markFreezeCompleted(accountingResult.getFreezeId());
                 }
+                
+                // CRITICAL: Update database immediately after accounting succeeds
+                // This ensures txnId/freezeId is persisted even if process crashes later
                 transactionRepository.update(transaction);
-                log.info("[{}] Accounting completed: type={}, txnId={}, freezeId={}", 
+                log.info("[{}] Accounting completed and state persisted: type={}, txnId={}, freezeId={}", 
                          correlationId, accountingResult.getType(), 
                          accountingResult.getCoreBankingTxnId(), accountingResult.getFreezeId());
             }
